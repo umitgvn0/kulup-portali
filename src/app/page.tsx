@@ -48,9 +48,10 @@ export default function ClubPortal() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
-        <div className="animate-pulse text-sm font-medium tracking-wider uppercase text-slate-400">
-          Kulüp Portalı Yükleniyor...
+      <div className="min-h-screen bg-zinc-950 text-white flex flex-col items-center justify-center gap-4">
+        <img src="/logo.jpg" alt="İnegöl Gençlergücü SK" className="w-16 h-16 rounded-2xl object-contain bg-white p-1 animate-pulse" />
+        <div className="text-xs font-semibold tracking-widest uppercase text-sky-400">
+          İnegöl Gençlergücü SK Yükleniyor...
         </div>
       </div>
     );
@@ -68,24 +69,30 @@ export default function ClubPortal() {
   const lastFinishedMatch = [...filteredMatches].reverse().find((m) => m.our_score !== null);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-20 max-w-md mx-auto shadow-2xl border-x border-slate-200">
-      {/* Üst Kulüp Başlığı */}
-      <header className="bg-slate-900 text-white pt-8 pb-6 px-5 rounded-b-3xl shadow-lg">
+    <div className="min-h-screen bg-slate-50 text-zinc-900 pb-20 max-w-md mx-auto shadow-2xl border-x border-zinc-200">
+      {/* Üst Kulüp Başlığı (Siyah & Gök Mavisi Kurumsal Kimlik) */}
+      <header className="bg-zinc-900 text-white pt-7 pb-7 px-5 rounded-b-3xl shadow-lg border-b-4 border-sky-400">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center font-extrabold text-xl shadow-inner">
-              GG
+            <div className="w-13 h-13 rounded-2xl bg-white p-1 flex items-center justify-center shadow-md shrink-0">
+              <img
+                src="/logo.jpg"
+                alt="İnegöl Gençlergücü SK Arması"
+                className="w-11 h-11 object-contain"
+              />
             </div>
             <div>
-              <span className="text-[10px] uppercase tracking-widest text-blue-400 font-semibold block">
-                Resmi Kulüp Portalı
+              <span className="text-[10px] uppercase tracking-widest text-sky-400 font-bold block">
+                Resmi Kulüp Portalı • 1977
               </span>
-              <h1 className="text-lg font-bold leading-tight">{club?.name || 'İnegöl Gençlergücü SK'}</h1>
+              <h1 className="text-base font-extrabold leading-tight tracking-tight">
+                {club?.name || 'İnegöl Gençlergücü SK'}
+              </h1>
             </div>
           </div>
           <Link
             href="/admin"
-            className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-full border border-slate-700 transition"
+            className="text-xs bg-zinc-800 hover:bg-zinc-700 text-sky-300 font-medium px-3 py-1.5 rounded-full border border-zinc-700 transition"
           >
             Yönetim
           </Link>
@@ -95,10 +102,10 @@ export default function ClubPortal() {
         <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
           <button
             onClick={() => setSelectedTeamId('all')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition ${
               selectedTeamId === 'all'
-                ? 'bg-blue-600 text-white shadow'
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                ? 'bg-sky-400 text-zinc-950 shadow'
+                : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
             }`}
           >
             Tüm Kulüp
@@ -107,10 +114,10 @@ export default function ClubPortal() {
             <button
               key={team.id}
               onClick={() => setSelectedTeamId(team.id)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition ${
                 selectedTeamId === team.id
-                  ? 'bg-blue-600 text-white shadow'
-                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  ? 'bg-sky-400 text-zinc-950 shadow'
+                  : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
               }`}
             >
               {team.name}
@@ -120,7 +127,7 @@ export default function ClubPortal() {
       </header>
 
       {/* Ana Navigasyon Sekmeleri */}
-      <nav className="grid grid-cols-4 gap-1 px-4 -mt-4">
+      <nav className="grid grid-cols-4 gap-1.5 px-4 -mt-4">
         {[
           { id: 'ozet', label: 'Özet', icon: Trophy },
           { id: 'fikstur', label: 'Fikstür', icon: Calendar },
@@ -133,10 +140,10 @@ export default function ClubPortal() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex flex-col items-center justify-center py-2.5 rounded-2xl text-xs font-semibold shadow-sm border transition ${
+              className={`flex flex-col items-center justify-center py-2.5 rounded-2xl text-xs font-bold shadow-sm border transition ${
                 isActive
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-slate-600 border-slate-100 hover:bg-slate-50'
+                  ? 'bg-zinc-900 text-sky-400 border-zinc-900'
+                  : 'bg-white text-zinc-600 border-zinc-100 hover:bg-zinc-50'
               }`}
             >
               <Icon className="w-4 h-4 mb-1" />
@@ -151,19 +158,19 @@ export default function ClubPortal() {
         {activeTab === 'ozet' && (
           <>
             {upcomingMatch && (
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-                <div className="flex items-center justify-between text-xs text-blue-600 font-bold mb-3">
+              <div className="bg-white rounded-2xl p-4 shadow-sm border border-zinc-200/80">
+                <div className="flex items-center justify-between text-xs text-sky-600 font-extrabold mb-3">
                   <span>SIRADAKİ MAÇ</span>
                   <span>{new Date(upcomingMatch.match_date).toLocaleDateString('tr-TR')}</span>
                 </div>
                 <div className="flex items-center justify-between text-center py-2">
-                  <div className="w-2/5 font-bold text-sm">Gençlergücü</div>
-                  <div className="w-1/5 text-xs font-extrabold bg-slate-100 py-1 rounded-lg text-slate-500">VS</div>
-                  <div className="w-2/5 font-bold text-sm">{upcomingMatch.opponent_name}</div>
+                  <div className="w-2/5 font-extrabold text-sm text-zinc-900">Gençlergücü</div>
+                  <div className="w-1/5 text-xs font-extrabold bg-sky-100 text-sky-800 py-1 rounded-lg">VS</div>
+                  <div className="w-2/5 font-extrabold text-sm text-zinc-900">{upcomingMatch.opponent_name}</div>
                 </div>
                 {upcomingMatch.location && (
-                  <div className="flex items-center gap-1 text-xs text-slate-500 mt-3 pt-2 border-t border-slate-100">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                  <div className="flex items-center gap-1 text-xs text-zinc-500 mt-3 pt-2 border-t border-zinc-100">
+                    <MapPin className="w-3.5 h-3.5 text-sky-500" />
                     <span>{upcomingMatch.location}</span>
                   </div>
                 )}
@@ -171,14 +178,14 @@ export default function ClubPortal() {
             )}
 
             {lastFinishedMatch && (
-              <div className="bg-slate-900 text-white rounded-2xl p-4 shadow-sm">
-                <div className="text-xs text-slate-400 font-medium mb-2">Son Maç Sonucu</div>
+              <div className="bg-zinc-900 text-white rounded-2xl p-4 shadow-md border-l-4 border-sky-400">
+                <div className="text-xs text-sky-400 font-semibold mb-2">Son Maç Sonucu</div>
                 <div className="flex items-center justify-between text-center">
-                  <div className="w-2/5 font-semibold text-sm">Gençlergücü</div>
-                  <div className="w-1/5 font-extrabold text-base bg-blue-600 py-1 rounded-lg">
+                  <div className="w-2/5 font-bold text-sm">Gençlergücü</div>
+                  <div className="w-1/5 font-extrabold text-base bg-sky-400 text-zinc-950 py-1 rounded-lg shadow">
                     {lastFinishedMatch.our_score} - {lastFinishedMatch.opponent_score}
                   </div>
-                  <div className="w-2/5 font-semibold text-sm">{lastFinishedMatch.opponent_name}</div>
+                  <div className="w-2/5 font-bold text-sm">{lastFinishedMatch.opponent_name}</div>
                 </div>
               </div>
             )}
@@ -186,14 +193,14 @@ export default function ClubPortal() {
             {announcements[0] && (
               <div
                 onClick={() => setActiveTab('gundem')}
-                className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 cursor-pointer hover:border-blue-200 transition"
+                className="bg-white rounded-2xl p-4 shadow-sm border border-zinc-200/80 cursor-pointer hover:border-sky-400 transition"
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[11px] font-bold text-amber-600 uppercase">Kulüp Duyurusu</span>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                  <span className="text-[11px] font-extrabold text-sky-600 uppercase">Kulüp Duyurusu</span>
+                  <ChevronRight className="w-4 h-4 text-zinc-400" />
                 </div>
-                <h3 className="font-bold text-sm text-slate-900">{announcements[0].title}</h3>
-                <p className="text-xs text-slate-600 mt-1 line-clamp-2">{announcements[0].content}</p>
+                <h3 className="font-bold text-sm text-zinc-900">{announcements[0].title}</h3>
+                <p className="text-xs text-zinc-600 mt-1 line-clamp-2">{announcements[0].content}</p>
               </div>
             )}
           </>
@@ -201,16 +208,18 @@ export default function ClubPortal() {
 
         {activeTab === 'fikstur' && (
           <div className="space-y-3">
-            <h2 className="font-bold text-sm text-slate-800">Maç Takvimi & Sonuçlar</h2>
+            <h2 className="font-bold text-sm text-zinc-800">Maç Takvimi & Sonuçlar</h2>
             {filteredMatches.map((m) => (
-              <div key={m.id} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
+              <div key={m.id} className="bg-white p-4 rounded-2xl border border-zinc-200/80 shadow-sm flex items-center justify-between">
                 <div>
-                  <div className="text-[11px] text-slate-400">
+                  <div className="text-[11px] text-zinc-400">
                     {new Date(m.match_date).toLocaleDateString('tr-TR')} • {m.is_home ? 'İç Saha' : 'Deplasman'}
                   </div>
-                  <div className="font-bold text-sm mt-0.5">Gençlergücü vs {m.opponent_name}</div>
+                  <div className="font-bold text-sm mt-0.5 text-zinc-900">Gençlergücü vs {m.opponent_name}</div>
                 </div>
-                <div className="font-extrabold text-sm px-3 py-1.5 rounded-xl bg-slate-100 text-slate-800">
+                <div className={`font-extrabold text-sm px-3 py-1.5 rounded-xl ${
+                  m.our_score !== null ? 'bg-zinc-900 text-sky-400' : 'bg-sky-50 text-sky-700'
+                }`}>
                   {m.our_score !== null ? `${m.our_score} - ${m.opponent_score}` : 'Oynanmadı'}
                 </div>
               </div>
@@ -220,22 +229,22 @@ export default function ClubPortal() {
 
         {activeTab === 'kadro' && (
           <div className="space-y-2.5">
-            <h2 className="font-bold text-sm text-slate-800">Takım Kadrosu</h2>
+            <h2 className="font-bold text-sm text-zinc-800">Takım Kadrosu</h2>
             {filteredPlayers.map((p) => (
-              <div key={p.id} className="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
+              <div key={p.id} className="bg-white p-3.5 rounded-2xl border border-zinc-200/80 shadow-sm flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-xl bg-zinc-900 text-sky-400 font-extrabold text-xs flex items-center justify-center border border-sky-400/30">
                     {p.jersey_number || '-'}
                   </div>
                   <div>
-                    <div className="font-bold text-sm">{p.full_name}</div>
-                    <div className="text-xs text-slate-500">{p.position}</div>
+                    <div className="font-bold text-sm text-zinc-900">{p.full_name}</div>
+                    <div className="text-xs text-zinc-500">{p.position}</div>
                   </div>
                 </div>
                 <div className="text-right text-xs">
-                  <span className="font-bold text-blue-600">{p.goals} Gol</span>
-                  <span className="text-slate-400 mx-1">•</span>
-                  <span className="text-slate-600">{p.assists} Asist</span>
+                  <span className="font-bold text-sky-600">{p.goals} Gol</span>
+                  <span className="text-zinc-300 mx-1">•</span>
+                  <span className="text-zinc-600">{p.assists} Asist</span>
                 </div>
               </div>
             ))}
@@ -244,14 +253,14 @@ export default function ClubPortal() {
 
         {activeTab === 'gundem' && (
           <div className="space-y-3">
-            <h2 className="font-bold text-sm text-slate-800">Duyurular & Haberler</h2>
+            <h2 className="font-bold text-sm text-zinc-800">Duyurular & Haberler</h2>
             {announcements.map((a) => (
-              <div key={a.id} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                <div className="text-[11px] text-slate-400 mb-1">
+              <div key={a.id} className="bg-white p-4 rounded-2xl border border-zinc-200/80 shadow-sm">
+                <div className="text-[11px] text-sky-600 font-semibold mb-1">
                   {new Date(a.created_at).toLocaleDateString('tr-TR')}
                 </div>
-                <h3 className="font-bold text-sm text-slate-900">{a.title}</h3>
-                <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">{a.content}</p>
+                <h3 className="font-bold text-sm text-zinc-900">{a.title}</h3>
+                <p className="text-xs text-zinc-600 mt-1.5 leading-relaxed">{a.content}</p>
               </div>
             ))}
           </div>
