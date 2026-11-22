@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { ArrowLeft, Plus, Trash2, CheckCircle2, Lock, Trophy, Users, Bell } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, CheckCircle2, Lock, Trophy, Users, Bell, LogOut } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminPanel() {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [pin, setPin] = useState('');
-  const [pinError, setPinError] = useState('');
+  const [session, setSession] = useState<any>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
 
   const [club, setClub] = useState<any>(null);
   const [teams, setTeams] = useState<any[]>([]);
@@ -37,6 +39,19 @@ export default function AdminPanel() {
   // Yeni Duyuru Formu
   const [annTitle, setAnnTitle] = useState('');
   const [annContent, setAnnContent] = useState('');
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setAuthLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const showNotice = (msg: string) => {
     setStatusMsg(msg);
@@ -79,20 +94,25 @@ export default function AdminPanel() {
   };
 
   useEffect(() => {
-    if (authenticated) {
+    if (session) {
       fetchData();
     }
-  }, [authenticated]);
+  }, [session]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Demo giriş şifresi: 1923 (İleride Supabase Auth ile değiştirilebilir)
-    if (pin === '1923') {
-      setAuthenticated(true);
-      setPinError('');
-    } else {
-      setPinError('Hatalı yönetici şifresi! (Demo şifresi: 1923)');
+    setLoginError('');
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      setLoginError('E-posta veya şifre hatalı!');
     }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
   };
 
   // Maç Ekle
@@ -100,7 +120,7 @@ export default function AdminPanel() {
     e.preventDefault();
     if (!club || !opponent || !matchDate) return;
 
-    await supabase.from('matches').insert({
+    const { error } = await supabase.from('matches').insert({
       club_id: club.id,
       team_id: teamId || null,
       opponent_name: opponent,
@@ -109,10 +129,12 @@ export default function AdminPanel() {
       location,
     });
 
-    setOpponent('');
-    setMatchDate('');
-    showNotice('Yeni maç fikstüre eklendi!');
-    fetchData();
+    if (!error) {
+      setOpponent('');
+      setMatchDate('');
+      showNotice('Yeni maç fikstüre eklendi!');
+      fetchData();
+    }
   };
 
   // Skor Güncelle
@@ -121,13 +143,15 @@ export default function AdminPanel() {
     const ourVal = s?.our === '' ? null : Number(s.our);
     const oppVal = s?.opp === '' ? null : Number(s.opp);
 
-    await supabase
+    const { error } = await supabase
       .from('matches')
       .update({ our_score: ourVal, opponent_score: oppVal })
       .eq('id', matchId);
 
-    showNotice('Maç skoru güncellendi!');
-    fetchData();
+    if (!error) {
+      showNotice('Maç skoru güncellendi!');
+      fetchData();
+    }
   };
 
   // Maç Sil
@@ -142,7 +166,7 @@ export default function AdminPanel() {
     e.preventDefault();
     if (!club || !playerName) return;
 
-    await supabase.from('players').insert({
+    const { error } = await supabase.from('players').insert({
       club_id: club.id,
       team_id: playerTeamId || null,
       full_name: playerName,
@@ -152,10 +176,12 @@ export default function AdminPanel() {
       assists: 0,
     });
 
-    setPlayerName('');
-    setJersey('');
-    showNotice('Futbolcu kadroya eklendi!');
-    fetchData();
+    if (!error) {
+      setPlayerName('');
+      setJersey('');
+      showNotice('Futbolcu kadroya eklendi!');
+      fetchData();
+    }
   };
 
   // Gol / Asist Artır
@@ -177,16 +203,18 @@ export default function AdminPanel() {
     e.preventDefault();
     if (!club || !annTitle || !annContent) return;
 
-    await supabase.from('announcements').insert({
+    const { error } = await supabase.from('announcements').insert({
       club_id: club.id,
       title: annTitle,
       content: annContent,
     });
 
-    setAnnTitle('');
-    setAnnContent('');
-    showNotice('Duyuru yayınlandı!');
-    fetchData();
+    if (!error) {
+      setAnnTitle('');
+      setAnnContent('');
+      showNotice('Duyuru yayınlandı!');
+      fetchData();
+    }
   };
 
   // Duyuru Sil
@@ -196,8 +224,16 @@ export default function AdminPanel() {
     fetchData();
   };
 
-  // Şifre Giriş Ekranı
-  if (!authenticated) {
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+        <p className="text-xs uppercase tracking-widest text-slate-400">Oturum Kontrol Ediliyor...</p>
+      </div>
+    );
+  }
+
+  // Supabase Auth Giriş Ekranı
+  if (!session) {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-5">
         <form onSubmit={handleLogin} className="w-full max-w-sm bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-4">
@@ -208,18 +244,27 @@ export default function AdminPanel() {
             <h1 className="text-lg font-bold">Kulüp Yönetim Paneli</h1>
             <p className="text-xs text-slate-400 mt-1">İnegöl Gençlergücü SK Yetkili Girişi</p>
           </div>
-          <div>
+          <div className="space-y-3">
+            <input
+              type="email"
+              placeholder="Yönetici E-posta"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-sm focus:outline-none focus:border-blue-500"
+              required
+            />
             <input
               type="password"
-              placeholder="Yönetici PIN (Demo: 1923)"
-              value={pin}
-              onChange={(e) => setPin(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-center text-lg tracking-widest focus:outline-none focus:border-blue-500"
+              placeholder="Şifre"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-sm focus:outline-none focus:border-blue-500"
+              required
             />
-            {pinError && <p className="text-xs text-red-400 text-center mt-2">{pinError}</p>}
+            {loginError && <p className="text-xs text-red-400 text-center">{loginError}</p>}
           </div>
           <button type="submit" className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 font-semibold text-sm transition">
-            Panele Giriş Yap
+            Güvenli Giriş Yap
           </button>
           <div className="text-center">
             <Link href="/" className="text-xs text-slate-400 hover:text-white">
@@ -240,10 +285,16 @@ export default function AdminPanel() {
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Siteye Dön</span>
           </Link>
-          <span className="text-xs font-semibold text-emerald-400">● Yönetici Aktif</span>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-1 text-xs text-red-300 hover:text-red-200 bg-slate-800 px-3 py-1.5 rounded-full"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Çıkış</span>
+          </button>
         </div>
         <h1 className="text-lg font-bold">{club?.name} — Yönetim</h1>
-        <p className="text-xs text-slate-400">Skor, fikstür, kadro ve duyuru kontrol merkezi</p>
+        <p className="text-xs text-slate-400">{session.user.email}</p>
 
         {/* Sekmeler */}
         <div className="grid grid-cols-3 gap-2 mt-4">
