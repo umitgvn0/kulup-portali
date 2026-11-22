@@ -2,257 +2,563 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Calendar, Users, Trophy, Bell, MapPin, Shield, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, CheckCircle2, Lock, Trophy, Users, Bell, LogOut } from 'lucide-react';
+import Link from 'next/link';
 
-export default function ClubPortal() {
+export default function AdminPanel() {
+  const [session, setSession] = useState<any>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+
   const [club, setClub] = useState<any>(null);
   const [teams, setTeams] = useState<any[]>([]);
-  const [selectedTeamId, setSelectedTeamId] = useState<string>('all');
-  const [players, setPlayers] = useState<any[]>([]);
   const [matches, setMatches] = useState<any[]>([]);
+  const [players, setPlayers] = useState<any[]>([]);
   const [announcements, setAnnouncements] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'genel' | 'fikstur' | 'kadro' | 'duyurular'>('genel');
-  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'maclar' | 'kadro' | 'duyurular'>('maclar');
+  const [statusMsg, setStatusMsg] = useState('');
+
+  // Yeni Maç Formu
+  const [opponent, setOpponent] = useState('');
+  const [matchDate, setMatchDate] = useState('');
+  const [teamId, setTeamId] = useState('');
+  const [location, setLocation] = useState('İnegöl İlçe Stadı');
+  const [isHome, setIsHome] = useState(true);
+
+  // Skor Düzenleme State'i
+  const [scores, setScores] = useState<Record<string, { our: string; opp: string }>>({});
+
+  // Yeni Oyuncu Formu
+  const [playerName, setPlayerName] = useState('');
+  const [position, setPosition] = useState('Orta Saha');
+  const [jersey, setJersey] = useState('');
+  const [playerTeamId, setPlayerTeamId] = useState('');
+
+  // Yeni Duyuru Formu
+  const [annTitle, setAnnTitle] = useState('');
+  const [annContent, setAnnContent] = useState('');
 
   useEffect(() => {
-    async function loadPortalData() {
-      const { data: clubData } = await supabase
-        .from('clubs')
-        .select('*')
-        .eq('slug', 'genclergucu')
-        .single();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setAuthLoading(false);
+    });
 
-      if (clubData) {
-        setClub(clubData);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
 
-        const [teamsRes, playersRes, matchesRes, annRes] = await Promise.all([
-          supabase.from('teams').select('*').eq('club_id', clubData.id).order('sort_order'),
-          supabase.from('players').select('*').eq('club_id', clubData.id).order('jersey_number'),
-          supabase.from('matches').select('*').eq('club_id', clubData.id).order('match_date', { ascending: true }),
-          supabase.from('announcements').select('*').eq('club_id', clubData.id).order('created_at', { ascending: false }),
-        ]);
-
-        setTeams(teamsRes.data || []);
-        setPlayers(playersRes.data || []);
-        setMatches(matchesRes.data || []);
-        setAnnouncements(annRes.data || []);
-      }
-      setLoading(false);
-    }
-
-    loadPortalData();
+    return () => subscription.unsubscribe();
   }, []);
 
-  if (loading) {
+  const showNotice = (msg: string) => {
+    setStatusMsg(msg);
+    setTimeout(() => setStatusMsg(''), 3000);
+  };
+
+  const fetchData = async () => {
+    const { data: clubData } = await supabase.from('clubs').select('*').eq('slug', 'genclergucu').single();
+    if (!clubData) return;
+    setClub(clubData);
+
+    const [tRes, mRes, pRes, aRes] = await Promise.all([
+      supabase.from('teams').select('*').eq('club_id', clubData.id).order('sort_order'),
+      supabase.from('matches').select('*').eq('club_id', clubData.id).order('match_date', { ascending: false }),
+      supabase.from('players').select('*').eq('club_id', clubData.id).order('jersey_number'),
+      supabase.from('announcements').select('*').eq('club_id', clubData.id).order('created_at', { ascending: false }),
+    ]);
+
+    const loadedTeams = tRes.data || [];
+    setTeams(loadedTeams);
+    if (loadedTeams.length > 0) {
+      setTeamId((prev) => prev || loadedTeams[0].id);
+      setPlayerTeamId((prev) => prev || loadedTeams[0].id);
+    }
+
+    const loadedMatches = mRes.data || [];
+    setMatches(loadedMatches);
+
+    const initialScores: Record<string, { our: string; opp: string }> = {};
+    loadedMatches.forEach((m: any) => {
+      initialScores[m.id] = {
+        our: m.our_score !== null ? String(m.our_score) : '',
+        opp: m.opponent_score !== null ? String(m.opponent_score) : '',
+      };
+    });
+    setScores(initialScores);
+
+    setPlayers(pRes.data || []);
+    setAnnouncements(aRes.data || []);
+  };
+
+  useEffect(() => {
+    if (session) {
+      fetchData();
+    }
+  }, [session]);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError('');
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      setLoginError('E-posta veya şifre hatalı!');
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
+
+  // Maç Ekle
+  const handleAddMatch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!club || !opponent || !matchDate) return;
+
+    const { error } = await supabase.from('matches').insert({
+      club_id: club.id,
+      team_id: teamId || null,
+      opponent_name: opponent,
+      match_date: new Date(matchDate).toISOString(),
+      is_home: isHome,
+      location,
+    });
+
+    if (!error) {
+      setOpponent('');
+      setMatchDate('');
+      showNotice('Yeni maç fikstüre eklendi!');
+      fetchData();
+    }
+  };
+
+  // Skor Güncelle
+  const handleSaveScore = async (matchId: string) => {
+    const s = scores[matchId];
+    const ourVal = s?.our === '' ? null : Number(s.our);
+    const oppVal = s?.opp === '' ? null : Number(s.opp);
+
+    const { error } = await supabase
+      .from('matches')
+      .update({ our_score: ourVal, opponent_score: oppVal })
+      .eq('id', matchId);
+
+    if (!error) {
+      showNotice('Maç skoru güncellendi!');
+      fetchData();
+    }
+  };
+
+  // Maç Sil
+  const handleDeleteMatch = async (id: string) => {
+    await supabase.from('matches').delete().eq('id', id);
+    showNotice('Maç silindi.');
+    fetchData();
+  };
+
+  // Oyuncu Ekle
+  const handleAddPlayer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!club || !playerName) return;
+
+    const { error } = await supabase.from('players').insert({
+      club_id: club.id,
+      team_id: playerTeamId || null,
+      full_name: playerName,
+      position,
+      jersey_number: jersey ? Number(jersey) : null,
+      goals: 0,
+      assists: 0,
+    });
+
+    if (!error) {
+      setPlayerName('');
+      setJersey('');
+      showNotice('Futbolcu kadroya eklendi!');
+      fetchData();
+    }
+  };
+
+  // Gol / Asist Artır
+  const handleStatChange = async (player: any, field: 'goals' | 'assists', delta: number) => {
+    const newVal = Math.max(0, (player[field] || 0) + delta);
+    await supabase.from('players').update({ [field]: newVal }).eq('id', player.id);
+    fetchData();
+  };
+
+  // Oyuncu Sil
+  const handleDeletePlayer = async (id: string) => {
+    await supabase.from('players').delete().eq('id', id);
+    showNotice('Oyuncu kadrodan çıkarıldı.');
+    fetchData();
+  };
+
+  // Duyuru Ekle
+  const handleAddAnnouncement = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!club || !annTitle || !annContent) return;
+
+    const { error } = await supabase.from('announcements').insert({
+      club_id: club.id,
+      title: annTitle,
+      content: annContent,
+    });
+
+    if (!error) {
+      setAnnTitle('');
+      setAnnContent('');
+      showNotice('Duyuru yayınlandı!');
+      fetchData();
+    }
+  };
+
+  // Duyuru Sil
+  const handleDeleteAnnouncement = async (id: string) => {
+    await supabase.from('announcements').delete().eq('id', id);
+    showNotice('Duyuru silindi.');
+    fetchData();
+  };
+
+  if (authLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6">
-        <Shield className="w-12 h-12 text-blue-500 animate-pulse mb-3" />
-        <p className="text-sm tracking-widest uppercase text-slate-400">Kulüp Portalı Yükleniyor...</p>
+      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+        <p className="text-xs uppercase tracking-widest text-slate-400">Oturum Kontrol Ediliyor...</p>
       </div>
     );
   }
 
-  const filteredPlayers = selectedTeamId === 'all'
-    ? players
-    : players.filter((p) => p.team_id === selectedTeamId);
-
-  const filteredMatches = selectedTeamId === 'all'
-    ? matches
-    : matches.filter((m) => m.team_id === selectedTeamId);
-
-  const nextMatch = filteredMatches.find((m) => m.our_score === null);
-  const lastMatch = [...filteredMatches].reverse().find((m) => m.our_score !== null);
+  // Supabase Auth Giriş Ekranı
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-5">
+        <form onSubmit={handleLogin} className="w-full max-w-sm bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-4">
+          <div className="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center mx-auto">
+            <Lock className="w-6 h-6" />
+          </div>
+          <div className="text-center">
+            <h1 className="text-lg font-bold">Kulüp Yönetim Paneli</h1>
+            <p className="text-xs text-slate-400 mt-1">İnegöl Gençlergücü SK Yetkili Girişi</p>
+          </div>
+          <div className="space-y-3">
+            <input
+              type="email"
+              placeholder="Yönetici E-posta"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-sm focus:outline-none focus:border-blue-500"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Şifre"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-sm focus:outline-none focus:border-blue-500"
+              required
+            />
+            {loginError && <p className="text-xs text-red-400 text-center">{loginError}</p>}
+          </div>
+          <button type="submit" className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 font-semibold text-sm transition">
+            Güvenli Giriş Yap
+          </button>
+          <div className="text-center">
+            <Link href="/" className="text-xs text-slate-400 hover:text-white">
+              ← Portala Geri Dön
+            </Link>
+          </div>
+        </form>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900 pb-24 max-w-md mx-auto shadow-2xl border-x border-slate-200">
-      {/* Üst Kulüp Başlığı */}
-      <header className="bg-slate-900 text-white pt-8 pb-6 px-5 rounded-b-3xl shadow-lg">
+    <div className="min-h-screen bg-slate-100 text-slate-900 pb-20 max-w-md mx-auto shadow-2xl border-x border-slate-200">
+      {/* Üst Bar */}
+      <header className="bg-slate-900 text-white px-5 pt-6 pb-5 rounded-b-3xl shadow-md">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center font-bold text-xl shadow-inner">
-              GG
-            </div>
-            <div>
-              <span className="text-[11px] uppercase tracking-wider text-blue-400 font-semibold">
-                Resmi Kulüp Portalı
-              </span>
-              <h1 className="text-lg font-bold leading-tight">{club?.name || 'İnegöl Gençlergücü SK'}</h1>
-            </div>
-          </div>
-          <a
-            href="/admin"
-            className="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-full text-slate-300 border border-slate-700"
-          >
-            Yönetim
-          </a>
-        </div>
-
-        {/* Benim Takımım Seçici */}
-        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+          <Link href="/" className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white bg-slate-800 px-3 py-1.5 rounded-full">
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Siteye Dön</span>
+          </Link>
           <button
-            onClick={() => setSelectedTeamId('all')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition ${
-              selectedTeamId === 'all' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300'
-            }`}
+            onClick={handleLogout}
+            className="flex items-center gap-1 text-xs text-red-300 hover:text-red-200 bg-slate-800 px-3 py-1.5 rounded-full"
           >
-            Tüm Kulüp
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Çıkış</span>
           </button>
-          {teams.map((team) => (
-            <button
-              key={team.id}
-              onClick={() => setSelectedTeamId(team.id)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition ${
-                selectedTeamId === team.id ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300'
-              }`}
-            >
-              {team.name}
-            </button>
-          ))}
+        </div>
+        <h1 className="text-lg font-bold">{club?.name} — Yönetim</h1>
+        <p className="text-xs text-slate-400">{session.user.email}</p>
+
+        {/* Sekmeler */}
+        <div className="grid grid-cols-3 gap-2 mt-4">
+          {[
+            { id: 'maclar', label: 'Maç & Skor', icon: Trophy },
+            { id: 'kadro', label: 'Kadro', icon: Users },
+            { id: 'duyurular', label: 'Duyurular', icon: Bell },
+          ].map((t) => {
+            const Icon = t.icon;
+            return (
+              <button
+                key={t.id}
+                onClick={() => setActiveTab(t.id as any)}
+                className={`flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition ${
+                  activeTab === t.id ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span>{t.label}</span>
+              </button>
+            );
+          })}
         </div>
       </header>
 
-      {/* Hızlı İkon Menü */}
-      <div className="grid grid-cols-4 gap-2 px-4 -mt-4">
-        {[
-          { id: 'genel', label: 'Özet', icon: Trophy },
-          { id: 'fikstur', label: 'Fikstür', icon: Calendar },
-          { id: 'kadro', label: 'Kadro', icon: Users },
-          { id: 'duyurular', label: 'Gündem', icon: Bell },
-        ].map((item) => {
-          const Icon = item.icon;
-          const active = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id as any)}
-              className={`flex flex-col items-center justify-center py-3 rounded-2xl shadow-sm border transition ${
-                active
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-              }`}
-            >
-              <Icon className="w-5 h-5 mb-1" />
-              <span className="text-[11px] font-semibold">{item.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      {/* Bildirim Mesajı */}
+      {statusMsg && (
+        <div className="mx-4 mt-4 bg-emerald-600 text-white text-xs font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 shadow">
+          <CheckCircle2 className="w-4 h-4 shrink-0" />
+          <span>{statusMsg}</span>
+        </div>
+      )}
 
-      {/* İçerik Alanı */}
-      <main className="px-4 mt-5 space-y-5">
-        {/* GENEL BAKIŞ */}
-        {activeTab === 'genel' && (
+      <main className="px-4 mt-5 space-y-6">
+        {/* 1. MAÇ & SKOR YÖNETİMİ */}
+        {activeTab === 'maclar' && (
           <>
-            {/* Sıradaki Maç Kartı */}
-            {nextMatch && (
-              <section className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
-                <div className="flex items-center justify-between text-xs text-slate-500 mb-3">
-                  <span className="font-semibold text-blue-600 uppercase">Sıradaki Maç</span>
-                  <span>{new Date(nextMatch.match_date).toLocaleDateString('tr-TR')}</span>
-                </div>
-                <div className="flex items-center justify-between font-bold text-base py-2">
-                  <span className="w-2/5 text-left">Gençlergücü</span>
-                  <span className="px-3 py-1 bg-slate-100 rounded-lg text-xs text-slate-600">VS</span>
-                  <span className="w-2/5 text-right">{nextMatch.opponent_name}</span>
-                </div>
-                <div className="mt-3 pt-2 border-t border-slate-100 flex items-center text-xs text-slate-500 gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                  <span>{nextMatch.location || 'İnegöl İlçe Stadı'}</span>
-                </div>
-              </section>
-            )}
+            <form onSubmit={handleAddMatch} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+              <h2 className="font-bold text-sm flex items-center gap-1.5">
+                <Plus className="w-4 h-4 text-blue-600" /> Yeni Maç Ekle
+              </h2>
+              <div className="grid grid-cols-2 gap-2">
+                <select
+                  value={teamId}
+                  onChange={(e) => setTeamId(e.target.value)}
+                  className="px-3 py-2 rounded-xl border border-slate-200 text-xs bg-slate-50"
+                >
+                  {teams.map((t) => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                  ))}
+                </select>
+                <select
+                  value={isHome ? 'home' : 'away'}
+                  onChange={(e) => setIsHome(e.target.value === 'home')}
+                  className="px-3 py-2 rounded-xl border border-slate-200 text-xs bg-slate-50"
+                >
+                  <option value="home">İç Saha</option>
+                  <option value="away">Deplasman</option>
+                </select>
+              </div>
+              <input
+                type="text"
+                placeholder="Rakip Takım Adı (örn: Kafkasspor)"
+                value={opponent}
+                onChange={(e) => setOpponent(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                required
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="datetime-local"
+                  value={matchDate}
+                  onChange={(e) => setMatchDate(e.target.value)}
+                  className="px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Saha / Stat"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                />
+              </div>
+              <button type="submit" className="w-full py-2.5 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-500">
+                Fikstüre Ekle
+              </button>
+            </form>
 
-            {/* Son Maç Skoru */}
-            {lastMatch && (
-              <section className="bg-slate-900 text-white rounded-2xl p-4 shadow-sm">
-                <div className="text-xs text-slate-400 mb-2">Son Maç Sonucu</div>
-                <div className="flex items-center justify-between font-bold">
-                  <span className="w-2/5 text-sm">Gençlergücü</span>
-                  <span className="px-3 py-1 bg-blue-600 rounded-xl text-base">
-                    {lastMatch.our_score} - {lastMatch.opponent_score}
-                  </span>
-                  <span className="w-2/5 text-right text-sm">{lastMatch.opponent_name}</span>
+            <div className="space-y-3">
+              <h2 className="font-bold text-sm">Mevcut Maçlar & Skor Girişi</h2>
+              {matches.map((m) => (
+                <div key={m.id} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between text-xs text-slate-500">
+                    <span>{new Date(m.match_date).toLocaleDateString('tr-TR')}</span>
+                    <button onClick={() => handleDeleteMatch(m.id)} className="text-red-500 hover:text-red-700">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between gap-2 font-bold text-xs">
+                    <span className="w-1/3">Gençlergücü</span>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="number"
+                        placeholder="-"
+                        value={scores[m.id]?.our ?? ''}
+                        onChange={(e) =>
+                          setScores({
+                            ...scores,
+                            [m.id]: { ...scores[m.id], our: e.target.value },
+                          })
+                        }
+                        className="w-11 py-1.5 text-center border border-slate-300 rounded-lg bg-slate-50"
+                      />
+                      <span>:</span>
+                      <input
+                        type="number"
+                        placeholder="-"
+                        value={scores[m.id]?.opp ?? ''}
+                        onChange={(e) =>
+                          setScores({
+                            ...scores,
+                            [m.id]: { ...scores[m.id], opp: e.target.value },
+                          })
+                        }
+                        className="w-11 py-1.5 text-center border border-slate-300 rounded-lg bg-slate-50"
+                      />
+                    </div>
+                    <span className="w-1/3 text-right">{m.opponent_name}</span>
+                  </div>
+                  <button
+                    onClick={() => handleSaveScore(m.id)}
+                    className="w-full py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800"
+                  >
+                    Skoru Kaydet
+                  </button>
                 </div>
-              </section>
-            )}
-
-            {/* Son Duyuru */}
-            {announcements[0] && (
-              <section className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-semibold text-amber-600 uppercase">Kulüp Duyurusu</span>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
-                </div>
-                <h3 className="font-bold text-sm mb-1">{announcements[0].title}</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">{announcements[0].content}</p>
-              </section>
-            )}
+              ))}
+            </div>
           </>
         )}
 
-        {/* FİKSTÜR & SKORLAR */}
-        {activeTab === 'fikstur' && (
-          <div className="space-y-3">
-            <h2 className="font-bold text-base">Maç Takvimi & Skorlar</h2>
-            {filteredMatches.map((m) => (
-              <div key={m.id} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                <div className="flex justify-between text-xs text-slate-500 mb-2">
-                  <span>{new Date(m.match_date).toLocaleDateString('tr-TR')}</span>
-                  <span>{m.is_home ? 'İç Saha' : 'Deplasman'}</span>
-                </div>
-                <div className="flex items-center justify-between font-bold text-sm">
-                  <span>Gençlergücü</span>
-                  <span className="px-2.5 py-1 rounded-lg bg-slate-100">
-                    {m.our_score !== null ? `${m.our_score} - ${m.opponent_score}` : 'Oynanmadı'}
-                  </span>
-                  <span>{m.opponent_name}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* KADRO */}
+        {/* 2. KADRO YÖNETİMİ */}
         {activeTab === 'kadro' && (
-          <div className="space-y-3">
-            <h2 className="font-bold text-base">Oyuncu Kadrosu ({filteredPlayers.length})</h2>
-            {filteredPlayers.map((player) => (
-              <div
-                key={player.id}
-                className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-slate-900 text-white font-bold flex items-center justify-center text-sm">
-                    #{player.jersey_number || '-'}
-                  </div>
-                  <div>
-                    <div className="font-bold text-sm">{player.full_name}</div>
-                    <div className="text-xs text-slate-500">{player.position}</div>
-                  </div>
-                </div>
-                <div className="text-right text-xs">
-                  <div className="font-bold text-blue-600">{player.goals} Gol</div>
-                  <div className="text-slate-400">{player.assists} Asist</div>
-                </div>
+          <>
+            <form onSubmit={handleAddPlayer} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+              <h2 className="font-bold text-sm flex items-center gap-1.5">
+                <Plus className="w-4 h-4 text-blue-600" /> Kadroya Futbolcu Ekle
+              </h2>
+              <div className="grid grid-cols-2 gap-2">
+                <select
+                  value={playerTeamId}
+                  onChange={(e) => setPlayerTeamId(e.target.value)}
+                  className="px-3 py-2 rounded-xl border border-slate-200 text-xs bg-slate-50"
+                >
+                  {teams.map((t) => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                  ))}
+                </select>
+                <select
+                  value={position}
+                  onChange={(e) => setPosition(e.target.value)}
+                  className="px-3 py-2 rounded-xl border border-slate-200 text-xs bg-slate-50"
+                >
+                  <option value="Kaleci">Kaleci</option>
+                  <option value="Defans">Defans</option>
+                  <option value="Orta Saha">Orta Saha</option>
+                  <option value="Forvet">Forvet</option>
+                </select>
               </div>
-            ))}
-          </div>
+              <div className="grid grid-cols-3 gap-2">
+                <input
+                  type="text"
+                  placeholder="Ad Soyad"
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
+                  className="col-span-2 px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                  required
+                />
+                <input
+                  type="number"
+                  placeholder="Forma No"
+                  value={jersey}
+                  onChange={(e) => setJersey(e.target.value)}
+                  className="px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                />
+              </div>
+              <button type="submit" className="w-full py-2.5 rounded-xl bg-blue-600 text-white text-xs font-semibold">
+                Oyuncuyu Kaydet
+              </button>
+            </form>
+
+            <div className="space-y-2.5">
+              {players.map((p) => (
+                <div key={p.id} className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                  <div>
+                    <div className="font-bold text-xs">#{p.jersey_number || '-'} {p.full_name}</div>
+                    <div className="text-[11px] text-slate-500">{p.position}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleStatChange(p, 'goals', 1)}
+                      className="px-2 py-1 rounded-lg bg-blue-50 text-blue-700 text-[11px] font-bold"
+                    >
+                      +1 Gol ({p.goals})
+                    </button>
+                    <button
+                      onClick={() => handleStatChange(p, 'assists', 1)}
+                      className="px-2 py-1 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-bold"
+                    >
+                      +1 Asist ({p.assists})
+                    </button>
+                    <button onClick={() => handleDeletePlayer(p.id)} className="text-red-500 ml-1">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
 
-        {/* DUYURULAR */}
+        {/* 3. DUYURU YÖNETİMİ */}
         {activeTab === 'duyurular' && (
-          <div className="space-y-3">
-            <h2 className="font-bold text-base">Kulüp Gündemi</h2>
-            {announcements.map((ann) => (
-              <div key={ann.id} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                <div className="text-[11px] text-slate-400 mb-1">
-                  {new Date(ann.created_at).toLocaleDateString('tr-TR')}
+          <>
+            <form onSubmit={handleAddAnnouncement} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+              <h2 className="font-bold text-sm flex items-center gap-1.5">
+                <Plus className="w-4 h-4 text-blue-600" /> Yeni Duyuru Yayınla
+              </h2>
+              <input
+                type="text"
+                placeholder="Duyuru Başlığı"
+                value={annTitle}
+                onChange={(e) => setAnnTitle(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                required
+              />
+              <textarea
+                placeholder="Duyuru detaylarını yazın..."
+                rows={3}
+                value={annContent}
+                onChange={(e) => setAnnContent(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                required
+              />
+              <button type="submit" className="w-full py-2.5 rounded-xl bg-blue-600 text-white text-xs font-semibold">
+                Yayınla
+              </button>
+            </form>
+
+            <div className="space-y-2.5">
+              {announcements.map((a) => (
+                <div key={a.id} className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-start justify-between gap-3">
+                  <div>
+                    <div className="font-bold text-xs">{a.title}</div>
+                    <p className="text-[11px] text-slate-600 mt-1">{a.content}</p>
+                  </div>
+                  <button onClick={() => handleDeleteAnnouncement(a.id)} className="text-red-500 shrink-0">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
-                <h3 className="font-bold text-sm mb-1">{ann.title}</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">{ann.content}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </>
         )}
       </main>
     </div>
