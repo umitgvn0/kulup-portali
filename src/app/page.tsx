@@ -123,52 +123,51 @@ export default function ClubPortal() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#09090B] text-white flex flex-col items-center justify-center gap-5">
+      <div className="min-h-screen bg-gradient-to-br from-[#DDF1FC] via-[#EEF8FE] to-[#CBE8FA] text-[#2B2727] flex flex-col items-center justify-center gap-5">
         <div className="relative">
-          <div className="absolute -inset-2 rounded-3xl bg-[#A6D9F7]/30 blur-xl animate-pulse" />
+          <div className="absolute -inset-3 rounded-3xl bg-[#A6D9F7]/70 blur-xl animate-pulse" />
           <img
             src="/logo.jpg"
             alt="İnegöl Gençlergücü SK"
-            className="relative w-20 h-20 rounded-2xl object-contain bg-white p-1.5 shadow-2xl"
+            className="relative w-20 h-20 rounded-2xl object-contain bg-white/90 p-1.5 shadow-xl border border-white"
           />
         </div>
         <div className="text-center space-y-1">
-          <div className="text-xs font-extrabold tracking-[0.25em] uppercase text-[#A6D9F7]">
+          <div className="text-xs font-black tracking-[0.25em] uppercase text-[#2B2727]">
             İNEGÖL GENÇLERGÜCÜ SK
           </div>
-          <div className="text-[11px] text-zinc-500">Maç Merkezi Yükleniyor...</div>
+          <div className="text-[11px] font-medium text-sky-800/70">Maç Merkezi Yükleniyor...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-zinc-100 pb-28 max-w-md mx-auto relative shadow-[0_0_60px_rgba(0,0,0,0.9)] border-x border-zinc-800/70 selection:bg-[#A6D9F7] selection:text-zinc-950">
-      {/* Arka Plan Dekoratif Gök Mavisi Işık Hüzmesi */}
-      <div className="pointer-events-none absolute top-0 inset-x-0 h-72 bg-gradient-to-b from-[#A6D9F7]/15 via-[#2B2727]/20 to-transparent" />
+    <div className="min-h-screen bg-gradient-to-b from-[#D6EEFC] via-[#EAF6FD] to-[#F5FAFE] text-[#2B2727] pb-28 max-w-md mx-auto relative overflow-x-hidden shadow-[0_0_50px_rgba(14,116,144,0.12)] border-x border-white/80 selection:bg-[#2B2727] selection:text-[#A6D9F7]">
+      {/* Arka Plan Cam Efektini Besleyen Yumuşak Gök Mavisi Küreler */}
+      <div className="pointer-events-none fixed top-[-60px] left-[-40px] w-72 h-72 rounded-full bg-[#A6D9F7]/65 blur-3xl" />
+      <div className="pointer-events-none fixed top-64 right-[-60px] w-80 h-80 rounded-full bg-sky-300/35 blur-3xl" />
+      <div className="pointer-events-none fixed bottom-10 left-6 w-64 h-64 rounded-full bg-[#A6D9F7]/45 blur-3xl" />
 
-      {/* ÜST HEADER */}
+      {/* ÜST GLASS HEADER */}
       <header className="relative z-10 pt-6 pb-4 px-5">
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-3.5">
-            <div className="relative group">
-              <div className="absolute -inset-0.5 rounded-2xl bg-gradient-to-tr from-[#A6D9F7] to-sky-300 opacity-60 blur-[2px]" />
-              <div className="relative w-12 h-12 rounded-2xl bg-white p-1 flex items-center justify-center shadow-lg">
-                <img
-                  src="/logo.jpg"
-                  alt="İnegöl Gençlergücü SK Arması"
-                  className="w-10 h-10 object-contain"
-                />
-              </div>
+        <div className="flex items-center justify-between mb-5 bg-white/55 backdrop-blur-xl border border-white/80 p-3 rounded-3xl shadow-[0_8px_25px_rgba(14,116,144,0.07)]">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-white p-1 flex items-center justify-center shadow-sm border border-[#A6D9F7]/50 shrink-0">
+              <img
+                src="/logo.jpg"
+                alt="İnegöl Gençlergücü SK Arması"
+                className="w-10 h-10 object-contain"
+              />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#A6D9F7] animate-ping" />
-                <span className="text-[10px] uppercase tracking-[0.2em] text-[#A6D9F7] font-bold">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping" />
+                <span className="text-[10px] uppercase tracking-[0.18em] text-sky-700 font-extrabold">
                   EST. 1977 • İNEGÖL
                 </span>
               </div>
-              <h1 className="text-base font-black tracking-tight text-white mt-0.5">
+              <h1 className="text-base font-black tracking-tight text-[#2B2727] mt-0.5">
                 {club?.name || 'İnegöl Gençlergücü SK'}
               </h1>
             </div>
@@ -176,21 +175,21 @@ export default function ClubPortal() {
 
           <Link
             href="/admin"
-            className="flex items-center gap-1.5 text-[11px] font-bold bg-zinc-900/90 hover:bg-zinc-800 text-[#A6D9F7] px-3.5 py-2 rounded-xl border border-zinc-800 shadow-inner transition active:scale-95"
+            className="flex items-center gap-1.5 text-[11px] font-bold bg-[#2B2727] hover:bg-zinc-800 text-[#A6D9F7] px-3.5 py-2 rounded-2xl shadow-md transition active:scale-95"
           >
             <Shield className="w-3.5 h-3.5" />
             <span>Yönetim</span>
           </Link>
         </div>
 
-        {/* YATAY KAYDIRILABİLİR KATEGORİ PİLLERİ */}
+        {/* YATAY KAYDIRILABİLİR GLASS KATEGORİ PİLLERİ */}
         <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
           <button
             onClick={() => setSelectedTeamId('all')}
-            className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all ${
+            className={`px-4 py-2 rounded-2xl text-xs font-extrabold whitespace-nowrap transition-all ${
               selectedTeamId === 'all'
-                ? 'bg-[#A6D9F7] text-zinc-950 shadow-[0_0_20px_rgba(166,217,247,0.35)]'
-                : 'bg-zinc-900/80 text-zinc-400 border border-zinc-800/80 hover:text-white'
+                ? 'bg-[#2B2727] text-[#A6D9F7] shadow-md'
+                : 'bg-white/60 backdrop-blur-md text-[#2B2727]/80 border border-white/80 hover:bg-white/90'
             }`}
           >
             Tüm Kulüp
@@ -199,10 +198,10 @@ export default function ClubPortal() {
             <button
               key={team.id}
               onClick={() => setSelectedTeamId(team.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all ${
+              className={`px-4 py-2 rounded-2xl text-xs font-extrabold whitespace-nowrap transition-all ${
                 selectedTeamId === team.id
-                  ? 'bg-[#A6D9F7] text-zinc-950 shadow-[0_0_20px_rgba(166,217,247,0.35)]'
-                  : 'bg-zinc-900/80 text-zinc-400 border border-zinc-800/80 hover:text-white'
+                  ? 'bg-[#2B2727] text-[#A6D9F7] shadow-md'
+                  : 'bg-white/60 backdrop-blur-md text-[#2B2727]/80 border border-white/80 hover:bg-white/90'
               }`}
             >
               {team.name}
@@ -212,21 +211,19 @@ export default function ClubPortal() {
       </header>
 
       {/* ANA İÇERİK ALANI */}
-      <main className="relative z-10 px-4 mt-2 space-y-5">
+      <main className="relative z-10 px-4 mt-2 space-y-4">
         {/* ==================== 1. ÖZET SEKMESİ ==================== */}
         {activeTab === 'ozet' && (
           <>
-            {/* SIRADAKİ MAÇ — STADYUM HERO KARTI */}
+            {/* SIRADAKİ MAÇ — BUZ MAVİSİ GLASS HERO KARTI */}
             {upcomingMatch ? (
-              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2B2727] via-zinc-900 to-zinc-950 p-5 border border-[#A6D9F7]/25 shadow-2xl">
-                <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-[#A6D9F7]/10 blur-2xl" />
-
+              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white/80 via-[#A6D9F7]/35 to-white/70 backdrop-blur-2xl p-5 border border-white shadow-[0_12px_32px_rgba(14,116,144,0.1)]">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#A6D9F7]/15 text-[#A6D9F7] text-[10px] font-black uppercase tracking-wider border border-[#A6D9F7]/20">
-                    <Flame className="w-3 h-3" /> Sıradaki Karşılaşma
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#2B2727] text-[#A6D9F7] text-[10px] font-black uppercase tracking-wider shadow-sm">
+                    <Flame className="w-3 h-3" /> Sıradaki Maç
                   </span>
-                  <span className="text-[11px] font-semibold text-zinc-400 flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-[#A6D9F7]" />
+                  <span className="text-[11px] font-bold text-[#2B2727]/80 flex items-center gap-1 bg-white/70 px-2.5 py-1 rounded-xl border border-white">
+                    <Clock className="w-3 h-3 text-sky-600" />
                     {new Date(upcomingMatch.match_date).toLocaleDateString('tr-TR', {
                       day: 'numeric',
                       month: 'short',
@@ -243,44 +240,44 @@ export default function ClubPortal() {
                 <div className="grid grid-cols-3 items-center text-center py-2">
                   {/* Gençlergücü */}
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-14 h-14 rounded-2xl bg-white p-1.5 shadow-lg flex items-center justify-center">
+                    <div className="w-15 h-15 rounded-2xl bg-white p-1.5 shadow-md border border-[#A6D9F7]/60 flex items-center justify-center">
                       <img src="/logo.jpg" alt="İGG" className="w-11 h-11 object-contain" />
                     </div>
-                    <span className="font-extrabold text-xs text-white leading-tight">
+                    <span className="font-black text-xs text-[#2B2727] leading-tight">
                       Gençlergücü
                     </span>
                   </div>
 
                   {/* VS Rozeti */}
                   <div className="flex flex-col items-center">
-                    <div className="px-3.5 py-1.5 rounded-2xl bg-zinc-950/90 border border-zinc-800 text-[#A6D9F7] font-black text-sm tracking-widest shadow-inner">
+                    <div className="px-3.5 py-1.5 rounded-2xl bg-white/90 border border-[#A6D9F7] text-[#2B2727] font-black text-sm tracking-widest shadow-sm">
                       VS
                     </div>
-                    <span className="text-[10px] font-bold text-zinc-500 uppercase mt-1.5">
+                    <span className="text-[10px] font-extrabold text-sky-800 uppercase mt-1.5">
                       {upcomingMatch.is_home ? 'İç Saha' : 'Deplasman'}
                     </span>
                   </div>
 
                   {/* Rakip */}
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-14 h-14 rounded-2xl bg-zinc-800/90 border border-zinc-700 flex items-center justify-center font-black text-lg text-zinc-300 shadow-lg">
+                    <div className="w-15 h-15 rounded-2xl bg-white/80 backdrop-blur-md border border-white flex items-center justify-center font-black text-lg text-[#2B2727] shadow-md">
                       {upcomingMatch.opponent_name?.slice(0, 2).toUpperCase()}
                     </div>
-                    <span className="font-extrabold text-xs text-zinc-200 leading-tight line-clamp-1">
+                    <span className="font-black text-xs text-[#2B2727] leading-tight line-clamp-1">
                       {upcomingMatch.opponent_name}
                     </span>
                   </div>
                 </div>
 
                 {upcomingMatch.location && (
-                  <div className="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-center gap-1.5 text-[11px] text-zinc-400">
-                    <MapPin className="w-3.5 h-3.5 text-[#A6D9F7]" />
+                  <div className="mt-4 pt-3 border-t border-sky-900/10 flex items-center justify-center gap-1.5 text-[11px] font-semibold text-[#2B2727]/80">
+                    <MapPin className="w-3.5 h-3.5 text-sky-600" />
                     <span>{upcomingMatch.location}</span>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="rounded-3xl bg-zinc-900/70 border border-zinc-800 p-5 text-center text-xs text-zinc-400">
+              <div className="rounded-3xl bg-white/60 backdrop-blur-xl border border-white/80 p-5 text-center text-xs font-medium text-[#2B2727]/70">
                 Planlanmış sıradaki maç bulunmuyor.
               </div>
             )}
@@ -288,23 +285,23 @@ export default function ClubPortal() {
             {/* SON MAÇ SKORU & FORM DURUMU */}
             <div className="grid grid-cols-1 gap-3.5">
               {lastFinishedMatch && (
-                <div className="rounded-2xl bg-zinc-900/90 border border-zinc-800/90 p-4 shadow-lg">
-                  <div className="flex items-center justify-between text-[11px] text-zinc-400 mb-3">
-                    <span className="font-bold uppercase tracking-wider text-zinc-300">
+                <div className="rounded-3xl bg-white/70 backdrop-blur-xl border border-white/90 p-4 shadow-[0_8px_24px_rgba(14,116,144,0.06)]">
+                  <div className="flex items-center justify-between text-[11px] text-[#2B2727]/60 mb-3">
+                    <span className="font-extrabold uppercase tracking-wider text-[#2B2727]">
                       Son Maç Sonucu
                     </span>
-                    <span>
+                    <span className="font-semibold">
                       {new Date(lastFinishedMatch.match_date).toLocaleDateString('tr-TR')}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <div className="w-1/3 font-extrabold text-xs text-white truncate">
+                    <div className="w-1/3 font-black text-xs text-[#2B2727] truncate">
                       Gençlergücü
                     </div>
-                    <div className="px-4 py-1.5 rounded-xl bg-[#A6D9F7] text-zinc-950 font-black text-base tracking-wider shadow-[0_0_15px_rgba(166,217,247,0.3)]">
+                    <div className="px-4 py-1.5 rounded-2xl bg-[#2B2727] text-[#A6D9F7] font-black text-base tracking-wider shadow-md">
                       {lastFinishedMatch.our_score} - {lastFinishedMatch.opponent_score}
                     </div>
-                    <div className="w-1/3 font-extrabold text-xs text-zinc-300 text-right truncate">
+                    <div className="w-1/3 font-black text-xs text-[#2B2727]/85 text-right truncate">
                       {lastFinishedMatch.opponent_name}
                     </div>
                   </div>
@@ -313,12 +310,12 @@ export default function ClubPortal() {
 
               {/* SON 5 MAÇ FORM ŞERİDİ */}
               {formStats.recent.length > 0 && (
-                <div className="rounded-2xl bg-zinc-900/70 border border-zinc-800/80 p-4 flex items-center justify-between">
+                <div className="rounded-3xl bg-white/65 backdrop-blur-xl border border-white/85 p-4 flex items-center justify-between shadow-[0_8px_24px_rgba(14,116,144,0.05)]">
                   <div>
-                    <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+                    <div className="text-[10px] font-extrabold text-sky-800 uppercase tracking-wider">
                       Son Maç Formu
                     </div>
-                    <div className="text-xs font-extrabold text-white mt-0.5">
+                    <div className="text-xs font-black text-[#2B2727] mt-0.5">
                       {formStats.wins}G • {formStats.draws}B • {formStats.losses}M
                     </div>
                   </div>
@@ -327,12 +324,12 @@ export default function ClubPortal() {
                       <div
                         key={item.id}
                         title={`${item.opp} (${item.score})`}
-                        className={`w-7 h-7 rounded-lg font-black text-xs flex items-center justify-center shadow-sm ${
+                        className={`w-7 h-7 rounded-xl font-black text-xs flex items-center justify-center shadow-sm ${
                           item.res === 'G'
-                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                            ? 'bg-emerald-500 text-white'
                             : item.res === 'B'
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                            : 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
+                            ? 'bg-amber-400 text-[#2B2727]'
+                            : 'bg-rose-500 text-white'
                         }`}
                       >
                         {item.res}
@@ -348,27 +345,27 @@ export default function ClubPortal() {
               {topScorer && (topScorer.goals > 0 || topScorer.assists > 0) && (
                 <div
                   onClick={() => setActiveTab('kadro')}
-                  className="rounded-2xl bg-gradient-to-r from-zinc-900 to-[#2B2727] border border-zinc-800 p-4 flex items-center justify-between cursor-pointer hover:border-[#A6D9F7]/40 transition"
+                  className="rounded-3xl bg-gradient-to-r from-white/80 to-[#A6D9F7]/40 backdrop-blur-xl border border-white p-4 flex items-center justify-between cursor-pointer hover:bg-white/90 transition shadow-[0_8px_24px_rgba(14,116,144,0.06)]"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#A6D9F7]/15 border border-[#A6D9F7]/30 text-[#A6D9F7] flex items-center justify-center">
+                    <div className="w-11 h-11 rounded-2xl bg-[#2B2727] text-[#A6D9F7] flex items-center justify-center shadow-sm">
                       <Award className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#A6D9F7]">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-sky-700">
                         Takım Skoreri
                       </span>
-                      <div className="font-extrabold text-sm text-white">
+                      <div className="font-black text-sm text-[#2B2727]">
                         {topScorer.full_name}
                       </div>
-                      <div className="text-[11px] text-zinc-400">
+                      <div className="text-[11px] font-medium text-[#2B2727]/70">
                         #{topScorer.jersey_number || '-'} • {topScorer.position}
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-base font-black text-[#A6D9F7]">{topScorer.goals} Gol</div>
-                    <div className="text-[11px] text-zinc-400">{topScorer.assists} Asist</div>
+                    <div className="text-base font-black text-[#2B2727]">{topScorer.goals} Gol</div>
+                    <div className="text-[11px] font-bold text-sky-800">{topScorer.assists} Asist</div>
                   </div>
                 </div>
               )}
@@ -376,16 +373,16 @@ export default function ClubPortal() {
               {announcements[0] && (
                 <div
                   onClick={() => setActiveTab('gundem')}
-                  className="rounded-2xl bg-zinc-900/90 border border-zinc-800 p-4 cursor-pointer hover:border-[#A6D9F7]/50 transition group"
+                  className="rounded-3xl bg-white/70 backdrop-blur-xl border border-white/90 p-4 cursor-pointer hover:bg-white/90 transition group shadow-[0_8px_24px_rgba(14,116,144,0.06)]"
                 >
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-[#A6D9F7] uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-black text-sky-700 uppercase tracking-wider">
                       <Sparkles className="w-3 h-3" /> Kulüpten Son Haber
                     </span>
-                    <ChevronRight className="w-4 h-4 text-zinc-500 group-hover:text-[#A6D9F7] group-hover:translate-x-0.5 transition" />
+                    <ChevronRight className="w-4 h-4 text-[#2B2727]/50 group-hover:text-[#2B2727] group-hover:translate-x-0.5 transition" />
                   </div>
-                  <h3 className="font-extrabold text-sm text-white">{announcements[0].title}</h3>
-                  <p className="text-xs text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
+                  <h3 className="font-black text-sm text-[#2B2727]">{announcements[0].title}</h3>
+                  <p className="text-xs text-[#2B2727]/75 mt-1 line-clamp-2 leading-relaxed">
                     {announcements[0].content}
                   </p>
                 </div>
@@ -398,14 +395,14 @@ export default function ClubPortal() {
         {activeTab === 'fikstur' && (
           <div className="space-y-3">
             <div className="flex items-center justify-between px-1">
-              <h2 className="font-extrabold text-sm text-white tracking-tight">
+              <h2 className="font-black text-sm text-[#2B2727] tracking-tight">
                 Maç Takvimi & Sonuçlar
               </h2>
-              <span className="text-[11px] text-zinc-500">{filteredMatches.length} Maç</span>
+              <span className="text-[11px] font-bold text-sky-800">{filteredMatches.length} Maç</span>
             </div>
 
             {filteredMatches.length === 0 ? (
-              <div className="rounded-2xl bg-zinc-900/70 border border-zinc-800 p-6 text-center text-xs text-zinc-400">
+              <div className="rounded-3xl bg-white/60 backdrop-blur-xl border border-white p-6 text-center text-xs text-[#2B2727]/70">
                 Bu kategori için henüz maç kaydı eklenmemiş.
               </div>
             ) : (
@@ -417,9 +414,9 @@ export default function ClubPortal() {
                 return (
                   <div
                     key={m.id}
-                    className="rounded-2xl bg-zinc-900/90 border border-zinc-800/90 p-4 shadow-md space-y-2.5"
+                    className="rounded-3xl bg-white/70 backdrop-blur-xl border border-white/90 p-4 shadow-[0_6px_20px_rgba(14,116,144,0.05)] space-y-2.5"
                   >
-                    <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                    <div className="flex items-center justify-between text-[11px] text-[#2B2727]/65 font-semibold">
                       <span>
                         {new Date(m.match_date).toLocaleDateString('tr-TR', {
                           day: 'numeric',
@@ -428,10 +425,10 @@ export default function ClubPortal() {
                         })}
                       </span>
                       <span
-                        className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                        className={`px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold ${
                           m.is_home
-                            ? 'bg-[#A6D9F7]/15 text-[#A6D9F7]'
-                            : 'bg-zinc-800 text-zinc-300'
+                            ? 'bg-[#A6D9F7]/60 text-[#2B2727]'
+                            : 'bg-white/80 text-[#2B2727]/70 border border-white'
                         }`}
                       >
                         {m.is_home ? 'İç Saha' : 'Deplasman'}
@@ -439,18 +436,18 @@ export default function ClubPortal() {
                     </div>
 
                     <div className="flex items-center justify-between gap-2">
-                      <div className="w-2/5 font-extrabold text-xs text-white truncate">
+                      <div className="w-2/5 font-black text-xs text-[#2B2727] truncate">
                         Gençlergücü
                       </div>
                       <div
-                        className={`px-3 py-1.5 rounded-xl font-black text-xs tracking-wider text-center min-w-[74px] ${
+                        className={`px-3 py-1.5 rounded-xl font-black text-xs tracking-wider text-center min-w-[74px] shadow-sm ${
                           !isPlayed
-                            ? 'bg-zinc-800 text-[#A6D9F7] border border-zinc-700'
+                            ? 'bg-white text-[#2B2727] border border-[#A6D9F7]'
                             : isWin
-                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                            ? 'bg-emerald-500 text-white'
                             : isLoss
-                            ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                            : 'bg-amber-500/20 text-amber-200 border border-amber-500/40'
+                            ? 'bg-rose-500 text-white'
+                            : 'bg-amber-400 text-[#2B2727]'
                         }`}
                       >
                         {isPlayed
@@ -460,14 +457,14 @@ export default function ClubPortal() {
                               minute: '2-digit',
                             })}
                       </div>
-                      <div className="w-2/5 font-extrabold text-xs text-zinc-200 text-right truncate">
+                      <div className="w-2/5 font-black text-xs text-[#2B2727]/85 text-right truncate">
                         {m.opponent_name}
                       </div>
                     </div>
 
                     {m.location && (
-                      <div className="flex items-center gap-1 text-[11px] text-zinc-500 pt-1 border-t border-zinc-800/70">
-                        <MapPin className="w-3 h-3 text-[#A6D9F7]" />
+                      <div className="flex items-center gap-1 text-[11px] font-medium text-[#2B2727]/65 pt-1.5 border-t border-sky-900/10">
+                        <MapPin className="w-3 h-3 text-sky-600" />
                         <span>{m.location}</span>
                       </div>
                     )}
@@ -482,45 +479,45 @@ export default function ClubPortal() {
         {activeTab === 'kadro' && (
           <div className="space-y-5">
             <div className="flex items-center justify-between px-1">
-              <h2 className="font-extrabold text-sm text-white tracking-tight">Takım Kadrosu</h2>
-              <span className="text-[11px] text-zinc-500">{filteredPlayers.length} Futbolcu</span>
+              <h2 className="font-black text-sm text-[#2B2727] tracking-tight">Takım Kadrosu</h2>
+              <span className="text-[11px] font-bold text-sky-800">{filteredPlayers.length} Futbolcu</span>
             </div>
 
             {filteredPlayers.length === 0 ? (
-              <div className="rounded-2xl bg-zinc-900/70 border border-zinc-800 p-6 text-center text-xs text-zinc-400">
+              <div className="rounded-3xl bg-white/60 backdrop-blur-xl border border-white p-6 text-center text-xs text-[#2B2727]/70">
                 Bu kategoriye henüz futbolcu eklenmemiş.
               </div>
             ) : (
               Object.entries(groupedPlayers).map(([posTitle, posPlayers]) => (
                 <div key={posTitle} className="space-y-2.5">
-                  <div className="text-[11px] font-black uppercase tracking-widest text-[#A6D9F7] px-1">
+                  <div className="text-[11px] font-black uppercase tracking-widest text-sky-800 px-1">
                     {posTitle}
                   </div>
                   {posPlayers.map((p) => (
                     <div
                       key={p.id}
-                      className="relative overflow-hidden rounded-2xl bg-zinc-900/90 border border-zinc-800/90 p-3.5 flex items-center justify-between shadow-md"
+                      className="relative overflow-hidden rounded-3xl bg-white/70 backdrop-blur-xl border border-white/90 p-3.5 flex items-center justify-between shadow-[0_6px_20px_rgba(14,116,144,0.05)]"
                     >
                       {/* Arka Plan Forma Numarası Filigranı */}
-                      <span className="pointer-events-none absolute right-24 -bottom-3 text-5xl font-black text-white/[0.03] select-none">
+                      <span className="pointer-events-none absolute right-24 -bottom-3 text-5xl font-black text-sky-900/[0.06] select-none">
                         {p.jersey_number || ''}
                       </span>
 
                       <div className="flex items-center gap-3.5 relative z-10">
-                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#2B2727] to-zinc-950 border border-[#A6D9F7]/30 text-[#A6D9F7] font-black text-sm flex items-center justify-center shadow-inner">
+                        <div className="w-11 h-11 rounded-2xl bg-[#2B2727] text-[#A6D9F7] font-black text-sm flex items-center justify-center shadow-sm">
                           {p.jersey_number || '-'}
                         </div>
                         <div>
-                          <div className="font-extrabold text-sm text-white">{p.full_name}</div>
-                          <div className="text-[11px] text-zinc-400">{p.position}</div>
+                          <div className="font-black text-sm text-[#2B2727]">{p.full_name}</div>
+                          <div className="text-[11px] font-medium text-[#2B2727]/65">{p.position}</div>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-1.5 relative z-10">
-                        <span className="px-2.5 py-1 rounded-lg bg-[#A6D9F7]/15 text-[#A6D9F7] font-extrabold text-[11px]">
+                        <span className="px-2.5 py-1 rounded-xl bg-[#A6D9F7]/65 text-[#2B2727] font-black text-[11px]">
                           {p.goals} G
                         </span>
-                        <span className="px-2.5 py-1 rounded-lg bg-zinc-800 text-zinc-300 font-bold text-[11px]">
+                        <span className="px-2.5 py-1 rounded-xl bg-white/90 border border-white text-[#2B2727]/80 font-extrabold text-[11px]">
                           {p.assists} A
                         </span>
                       </div>
@@ -536,31 +533,31 @@ export default function ClubPortal() {
         {activeTab === 'gundem' && (
           <div className="space-y-3.5">
             <div className="flex items-center justify-between px-1">
-              <h2 className="font-extrabold text-sm text-white tracking-tight">
+              <h2 className="font-black text-sm text-[#2B2727] tracking-tight">
                 Kulüp Duyuruları & Haberler
               </h2>
-              <span className="text-[11px] text-zinc-500">{announcements.length} Duyuru</span>
+              <span className="text-[11px] font-bold text-sky-800">{announcements.length} Duyuru</span>
             </div>
 
             {announcements.length === 0 ? (
-              <div className="rounded-2xl bg-zinc-900/70 border border-zinc-800 p-6 text-center text-xs text-zinc-400">
+              <div className="rounded-3xl bg-white/60 backdrop-blur-xl border border-white p-6 text-center text-xs text-[#2B2727]/70">
                 Henüz yayınlanmış bir duyuru bulunmuyor.
               </div>
             ) : (
               announcements.map((a) => (
                 <div
                   key={a.id}
-                  className="rounded-2xl bg-zinc-900/90 border border-zinc-800/90 p-4 shadow-md border-l-4 border-l-[#A6D9F7]"
+                  className="rounded-3xl bg-white/75 backdrop-blur-xl border border-white/90 p-4 shadow-[0_6px_20px_rgba(14,116,144,0.05)] border-l-4 border-l-[#2B2727]"
                 >
-                  <div className="text-[10px] font-bold text-[#A6D9F7] uppercase tracking-wider mb-1">
+                  <div className="text-[10px] font-extrabold text-sky-700 uppercase tracking-wider mb-1">
                     {new Date(a.created_at).toLocaleDateString('tr-TR', {
                       day: 'numeric',
                       month: 'long',
                       year: 'numeric',
                     })}
                   </div>
-                  <h3 className="font-extrabold text-sm text-white">{a.title}</h3>
-                  <p className="text-xs text-zinc-300 mt-2 leading-relaxed whitespace-pre-line">
+                  <h3 className="font-black text-sm text-[#2B2727]">{a.title}</h3>
+                  <p className="text-xs text-[#2B2727]/80 mt-2 leading-relaxed whitespace-pre-line">
                     {a.content}
                   </p>
                 </div>
@@ -570,9 +567,9 @@ export default function ClubPortal() {
         )}
       </main>
 
-      {/* SABİT ALT MOBİL NAVİGASYON BARI (GLASSMORPHISM) */}
+      {/* SABİT ALT BUZLU CAM NAVİGASYON BARI */}
       <nav className="fixed bottom-3 inset-x-0 z-50 max-w-md mx-auto px-4">
-        <div className="grid grid-cols-4 gap-1 bg-zinc-900/85 backdrop-blur-xl border border-zinc-800/90 p-1.5 rounded-2xl shadow-[0_10px_35px_rgba(0,0,0,0.85)]">
+        <div className="grid grid-cols-4 gap-1 bg-white/75 backdrop-blur-2xl border border-white p-1.5 rounded-3xl shadow-[0_12px_35px_rgba(14,116,144,0.16)]">
           {[
             { id: 'ozet', label: 'Özet', icon: Trophy },
             { id: 'fikstur', label: 'Fikstür', icon: Calendar },
@@ -585,10 +582,10 @@ export default function ClubPortal() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex flex-col items-center justify-center py-2 rounded-xl text-[11px] font-extrabold transition-all ${
+                className={`flex flex-col items-center justify-center py-2 rounded-2xl text-[11px] font-black transition-all ${
                   isActive
-                    ? 'bg-[#A6D9F7] text-zinc-950 shadow-[0_0_15px_rgba(166,217,247,0.3)]'
-                    : 'text-zinc-400 hover:text-white'
+                    ? 'bg-[#2B2727] text-[#A6D9F7] shadow-md'
+                    : 'text-[#2B2727]/65 hover:text-[#2B2727]'
                 }`}
               >
                 <Icon className="w-4 h-4 mb-0.5" />
